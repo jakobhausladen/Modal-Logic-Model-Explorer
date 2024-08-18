@@ -3,10 +3,28 @@ export class PointedModel {
         this.worlds = new Set();
         this.selectedWorld = null;
         this.relations = [];
+        this.observers = [];
+    }
+
+    attachObserver(observer) {
+        if (!this.observers.includes(observer)) {
+            this.observers.push(observer);
+        }
+    }
+
+    detachObserver(observer) {
+        this.observers = this.observers.filter(obs => obs != observer);
+    }
+
+    notifyObservers() {
+        for (const observer of this.observers) {
+            observer.update(this);
+        }
     }
 
     addWorld(world) {
         this.worlds.add(world);
+        this.notifyObservers();
     }
 
     removeWorld(world) {
@@ -20,12 +38,14 @@ export class PointedModel {
         if (this.selectedWorld === world) {
             this.selectedWorld = null;
         }
+        this.notifyObservers();
     }
 
     setSelectedWorld(world) {
         if (this.worlds.has(world)) {
             this.selectedWorld = world;
         }
+        this.notifyObservers();
     }
 
     getSelectedWorld() {
@@ -34,10 +54,12 @@ export class PointedModel {
 
     addRelation(relation) {
         this.relations.push(relation);
+        this.notifyObservers();
     }
 
     removeRelation(relationName) {
         this.relations = this.relations.filter(relation => relation.getName() != relationName);
+        this.notifyObservers();
     }
 
     addLink(relationName, worldFrom, worldTo) {
@@ -45,6 +67,7 @@ export class PointedModel {
         if (relation) {
             relation.addLink(worldFrom, worldTo);
         }
+        this.notifyObservers();
     }
 
     removeLink(relationName, worldFrom, worldTo) {
@@ -52,8 +75,7 @@ export class PointedModel {
         if (relation) {
             relation.removeLink(worldFrom, worldTo);
         }
+        this.notifyObservers();
     }
-
-
 
 }
