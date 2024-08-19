@@ -1,6 +1,5 @@
 export class World {
-    constructor(index, name) {
-        this.index = index;
+    constructor(name) {
         this.name = name;
         this.atoms = new Set();
     }

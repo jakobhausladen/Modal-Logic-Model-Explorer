@@ -8,16 +8,17 @@ export class ModelUI extends UIComponent {
         this.modelUIDiv = document.getElementById("model-ui");
         this.gridNumber = gridNumber;
 
-        // Stores world positions with world index as key
+        // Stores world positions with world as key
         this.worldPositions = new Map();
-        // Counter for serves as index for newly created worlds
+
+        // Counter serves as index for newly created worlds
         this.worldCounter = 0;
 
         this.init()
     }
 
     init() {
-        // Add the SVG element which will be the interface to add/remove and display worlds and links
+        // Add the SVG element that will be the interface for adding/removing and displaying worlds and links
         this.svgNS = "http://www.w3.org/2000/svg";
         this.svgElement = document.createElementNS(this.svgNS, "svg");
         this.svgElement.setAttribute("width", "500");
@@ -42,8 +43,7 @@ export class ModelUI extends UIComponent {
         // Draw worlds
         const selectedWorld = model.getSelectedWorld();
         for (const world of model.getWorlds()) {
-            const worldIndex = world.getIndex();
-            const { worldX, worldY } = this.worldPositions.get(worldIndex);
+            const { worldX, worldY } = this.worldPositions.get(world);
             const isSelected = world === selectedWorld;
             this.svgDrawer.drawWorld(worldX, worldY, isSelected);
         }
@@ -56,26 +56,26 @@ export class ModelUI extends UIComponent {
         const worldX = this.snapToGrid(clickCoords.x);
         const worldY = this.snapToGrid(clickCoords.y);
 
-        const indexToRemove = this.getWorldIndexAtPos(worldX, worldY);
+        const worldToRemove = this.getWorldAtPos(worldX, worldY);
         // If there exists a world at the mouse position: remove it, else add a new world
-        if (indexToRemove) {
-            this.worldPositions.delete(indexToRemove);
-            this.model.removeWorldByIndex(indexToRemove);
+        if (worldToRemove) {
+            this.worldPositions.delete(worldToRemove);
+            this.model.removeWorld(worldToRemove);
         } else {
             // Instantiate new world
             this.worldCounter += 1;
-            const newWorld = new World(this.worldCounter, `World ${this.worldCounter}`);
+            const newWorld = new World(`World ${this.worldCounter}`);
             // Store world position and add world to model
-            this.worldPositions.set(newWorld.getIndex(), { worldX, worldY });
+            this.worldPositions.set(newWorld, { worldX, worldY });
             this.model.addWorld(newWorld);
         }
     }
 
-    getWorldIndexAtPos(x, y) {
-        // Returns index (key of worldPositions) of the world at a given position (or null)
-        for (const [index, pos] of this.worldPositions.entries()) {
+    getWorldAtPos(x, y) {
+        // Returns the world object at a given position (or null if no world is found)
+        for (const [world, pos] of this.worldPositions.entries()) {
             if (pos.worldX === x && pos.worldY === y) {
-                return index;
+                return world;
             }
         }
         return null;
