@@ -27,6 +27,16 @@ export class PointedModel {
         this.notifyObservers();
     }
 
+    getWorldByIndex(index) {
+        // Find a world based on its index
+        for (const world of this.worlds) {
+            if (world.getIndex() === index) {
+                return world;
+            }
+        }
+        return undefined;
+    }
+
     removeWorld(world) {
         // Remove world
         this.worlds.delete(world);
@@ -39,6 +49,17 @@ export class PointedModel {
             this.selectedWorld = null;
         }
         this.notifyObservers();
+    }
+
+    removeWorldByIndex(index) {
+        const worldToRemove = this.getWorldByIndex(index);
+        if (worldToRemove) {
+            this.removeWorld(worldToRemove);
+        }
+    }
+
+    getWorlds() {
+        return this.worlds;
     }
 
     setSelectedWorld(world) {

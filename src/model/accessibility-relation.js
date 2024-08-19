@@ -1,4 +1,4 @@
-import { DefaultMap } from "../utils/default-map";
+import { DefaultMap } from "../utils/default-map.js";
 
 export class AccessibilityRelation {
     constructor(name) {
