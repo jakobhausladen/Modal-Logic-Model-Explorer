@@ -97,7 +97,7 @@ export class PointedModel {
         return relation.isAccessible(worldFrom, worldTo);
     }
 
-    getAccessibleWorld(relationIndex, worldFrom) {
+    getAccessibleWorlds(relationIndex, worldFrom) {
         const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
         return relation.getAccessibleWorlds(worldFrom);
     }
