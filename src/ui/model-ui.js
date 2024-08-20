@@ -10,9 +10,16 @@ export class ModelUI extends UIComponent {
 
         // Stores world positions with world as key
         this.worldPositions = new Map();
+        // For each link, remember the clicks used to create it
+        this.linkClicks = new Map();
 
         // Counter serves as index for newly created worlds
         this.worldCounter = 0;
+
+        // Relation index 1 is hardcoded for now; later we want the be able to switch between relations
+        this.selectedRelation = 1;
+        // Stores selected world and click position of the first of two clicks used to create a link 
+        this.linkStartPoint = null;
 
         this.init()
     }
@@ -47,6 +54,16 @@ export class ModelUI extends UIComponent {
             const isSelected = world === selectedWorld;
             this.svgDrawer.drawWorld(worldX, worldY, isSelected);
         }
+
+        // Draw links
+        for (const link of model.getLinks()) {
+            const { worldFrom, worldTo, relationIndex } = link;
+            const linkKey = this.createLinkKey(worldFrom, worldTo, relationIndex);
+            const worldFromPos = this.worldPositions.get(worldFrom);
+            const worldToPos = this.worldPositions.get(worldTo);
+            const { clickFrom, clickTo } = this.linkClicks.get(linkKey);
+            this.svgDrawer.drawLink(worldFromPos, clickFrom, worldToPos, clickTo, relationIndex);
+        }
     }
 
     handleRightClick(event) {
@@ -69,6 +86,44 @@ export class ModelUI extends UIComponent {
             this.worldPositions.set(newWorld, { worldX, worldY });
             this.model.addWorld(newWorld);
         }
+    }
+
+    handleLeftClick(event) {
+        const clickCoords = this.getCoordinates(event);
+        const worldX = this.snapToGrid(clickCoords.x);
+        const worldY = this.snapToGrid(clickCoords.y);
+
+        const world = this.getWorldAtPos(worldX, worldY);
+        if (event.shiftKey) {
+            // If shift is pressed...
+            if (this.linkStartPoint && world) {
+                // ... and first world for link has already been selected
+                const worldFrom = this.linkStartPoint.world;
+                const linkExists = this.model.isAccessible(this.selectedRelation, worldFrom, world);
+                if (linkExists) {
+                    // ...and link already exists: remove link
+                    this.model.removeLink(this.selectedRelation, worldFrom, world);
+                    this.linkStartPoint = null;
+                } else {
+                    // ...and link doesn't yet  exists: add link
+                    const clickFrom = this.linkStartPoint.clickPosition;
+                    const linkKey = this.createLinkKey(worldFrom, world, this.selectedRelation);
+                    this.linkClicks.set(linkKey, { clickFrom, clickTo: clickCoords });
+                    this.model.addLink(this.selectedRelation, worldFrom, world);
+                    this.linkStartPoint = null;
+                }
+            } else if (world) {
+                //  ... and first world for link hasn't been clicked yet: remember world and click position
+                this.linkStartPoint = { world: world, clickPosition: { x: clickCoords.x, y: clickCoords.y } };
+            }
+        } else {
+            // If shift is not pressed, select world
+            this.model.setSelectedWorld(world);
+        }
+    }
+
+    createLinkKey(worldFrom, worldTo, relationIndex) {
+        return `${worldFrom.getIndex()}-${worldTo.getIndex()}-${relationIndex}`;
     }
 
     getWorldAtPos(x, y) {

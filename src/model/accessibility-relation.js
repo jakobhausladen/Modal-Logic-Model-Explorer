@@ -7,8 +7,16 @@ export class AccessibilityRelation {
         this.links = new DefaultMap(() => new Set());
     }
 
+    getIndex() {
+        return this.index;
+    }
+
     getName() {
         return this.name;
+    }
+
+    setName(name) {
+        this.name = name;
     }
 
     addLink(worldFrom, worldTo) {
@@ -19,6 +27,17 @@ export class AccessibilityRelation {
         this.links.get(worldFrom).delete(worldTo);
     }
 
+    getLinks() {
+        // Returns an array of link objects of the form { worldFrom, worldTo, relationIndex }
+        const linkObjects = [];
+        for (const [worldFrom, accessibleWorlds] of this.links.entries()) {
+            for (const worldTo of accessibleWorlds) {
+                linkObjects.push({ worldFrom, worldTo, relationIndex: this.index });
+            }
+        }
+        return linkObjects;
+    }
+
     removeWorld(world) {
         // Remove outgoing links
         this.links.delete(world);
@@ -27,5 +46,9 @@ export class AccessibilityRelation {
         for (const [worldFrom, accessibleWorlds] of this.links.entries()) {
             accessibleWorlds.delete(world);
         }
+    }
+
+    isAccessible(worldFrom, worldTo) {
+        return this.links.get(worldFrom).has(worldTo);
     }
 }

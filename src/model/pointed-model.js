@@ -61,25 +61,40 @@ export class PointedModel {
         this.notifyObservers();
     }
 
-    removeRelation(relationName) {
-        this.relations = this.relations.filter(relation => relation.getName() != relationName);
+    removeRelation(relationIndex) {
+        this.relations = this.relations.filter(relation => relation.getIndex() != relationIndex);
         this.notifyObservers();
     }
 
-    addLink(relationName, worldFrom, worldTo) {
-        const relation = this.relations.find(relation => relation.getName() === relationName);
+    addLink(relationIndex, worldFrom, worldTo) {
+        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
         if (relation) {
             relation.addLink(worldFrom, worldTo);
         }
         this.notifyObservers();
     }
 
-    removeLink(relationName, worldFrom, worldTo) {
-        const relation = this.relations.find(relation => relation.getName() === relationName);
+    removeLink(relationIndex, worldFrom, worldTo) {
+        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
         if (relation) {
             relation.removeLink(worldFrom, worldTo);
         }
         this.notifyObservers();
+    }
+
+    getLinks() {
+        // Returns an array of link objects of the form { worldFrom, worldTo, relationIndex }
+        const allLinks = [];
+        for (const relation of this.relations) {
+            const relationLinks = relation.getLinks();
+            allLinks.push(...relationLinks);
+        }
+        return allLinks;
+    }
+
+    isAccessible(relationIndex, worldFrom, worldTo) {
+        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+        return relation.isAccessible(worldFrom, worldTo);
     }
 
 }

@@ -4,7 +4,7 @@ import { ModelUI } from "./src/ui/model-ui.js";
 
 const model = new PointedModel();
 
-const relation = new AccessibilityRelation("R");
+const relation = new AccessibilityRelation(1);
 model.addRelation(relation);
 
 const modelUI = new ModelUI(model, 5);
