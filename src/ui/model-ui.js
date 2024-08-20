@@ -64,7 +64,7 @@ export class ModelUI extends UIComponent {
         } else {
             // Instantiate new world
             this.worldCounter += 1;
-            const newWorld = new World(`World ${this.worldCounter}`);
+            const newWorld = new World(this.worldCounter);
             // Store world position and add world to model
             this.worldPositions.set(newWorld, { worldX, worldY });
             this.model.addWorld(newWorld);

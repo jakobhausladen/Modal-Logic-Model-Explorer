@@ -1,7 +1,8 @@
 import { DefaultMap } from "../utils/default-map.js";
 
 export class AccessibilityRelation {
-    constructor(name) {
+    constructor(index, name=`Relation ${index}`) {
+        this.index = index;
         this.name = name;
         this.links = new DefaultMap(() => new Set());
     }
