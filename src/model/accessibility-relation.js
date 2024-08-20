@@ -51,4 +51,8 @@ export class AccessibilityRelation {
     isAccessible(worldFrom, worldTo) {
         return this.links.get(worldFrom).has(worldTo);
     }
+
+    getAccessibleWorlds(worldFrom) {
+        return this.links.get(worldFrom);
+    }
 }
