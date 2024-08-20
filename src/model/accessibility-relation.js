@@ -53,6 +53,6 @@ export class AccessibilityRelation {
     }
 
     getAccessibleWorlds(worldFrom) {
-        return this.links.get(worldFrom);
+        return Array.from(this.links.get(worldFrom));
     }
 }

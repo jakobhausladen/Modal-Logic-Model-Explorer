@@ -52,7 +52,7 @@ export class Possibility extends UnaryFormula {
 
     isSatisfied(world, model) {
         // Relation hard coded for now
-        const accessibleWorlds = Array.from(model.getAccessibleWorlds(relationIndex, world));
+        const accessibleWorlds = model.getAccessibleWorlds(relationIndex, world);
         return accessibleWorlds.some((accessibleWorld) => this.subFormula.isSatisfied(accessibleWorld, model));
     }
 
@@ -69,7 +69,7 @@ export class Necessity extends UnaryFormula {
 
     isSatisfied(world, model) {
         // Relation hard coded for now
-        const accessibleWorlds = Array.from(model.getAccessibleWorlds(relationIndex, world));
+        const accessibleWorlds = model.getAccessibleWorlds(relationIndex, world);
         return accessibleWorlds.every((accessibleWorld) => this.subFormula.isSatisfied(accessibleWorld, model));
     }
 
