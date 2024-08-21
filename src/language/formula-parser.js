@@ -50,6 +50,11 @@ export class FormulaParser {
         }
     }
 
+    parseSetFormula(input) {
+        // Not implemented yet
+        // Determine type of operator, split list of formulas at top level occurances of ",", and return the relevant set formula
+    }
+
     findTopLevelOperator(input) {
         let nestingLevel = 0;
         const binaryOperators = ["and", "or", "then"];

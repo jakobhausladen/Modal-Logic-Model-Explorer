@@ -52,3 +52,59 @@ body {
     border: 1px solid #ccc;
     border-radius: 0%;
 }
+
+
+/* Sidebar */
+
+.tabs {
+    display: flex;
+    width: 100%;
+    height: 50px;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    border: none;
+    border-right: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    transition: background-color 0.1s;
+}
+
+.active {
+    border-bottom: none;
+    background-color: white;
+}
+
+.tab:last-child {
+    border-right: none;
+}
+
+.tab:not(.active):hover {
+    background-color: #d0d0d0;
+}
+
+
+/* Word UI */
+#world-ui-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#atoms {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.atom-input {
+    width: 60%;
+    padding: 5px 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 0%;
+}

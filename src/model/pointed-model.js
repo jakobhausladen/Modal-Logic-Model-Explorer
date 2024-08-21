@@ -101,4 +101,8 @@ export class PointedModel {
         const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
         return relation.getAccessibleWorlds(worldFrom);
     }
+
+    setStateOfSelectedWorld(atoms) {
+        this.selectedWorld.setState(atoms);
+    }
 }
