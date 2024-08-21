@@ -45,6 +45,14 @@ export class PointedModel {
         return this.worlds;
     }
 
+    getWorldByIndex(index) {
+        for (const world of this.worlds) {
+            if (world.getIndex() === index) {
+                return world;
+            }
+        }
+    }
+
     setSelectedWorld(world) {
         if (this.worlds.has(world)) {
             this.selectedWorld = world;

@@ -21,6 +21,8 @@ export class ModelUI extends UIComponent {
         // Stores selected world and click position of the first of two clicks used to create a link 
         this.linkStartPoint = null;
 
+        this.draggedWorld = null;
+
         this.init()
     }
 
@@ -41,6 +43,10 @@ export class ModelUI extends UIComponent {
         // Event listeners to handle right and left clicks
         this.svgElement.addEventListener("click", (event) => this.handleLeftClick(event));
         this.svgElement.addEventListener("contextmenu", (event) => this.handleRightClick(event));
+
+        // Event listeners for the dragging mechanism
+        this.svgElement.addEventListener("mousedown", (event) => this.handleMouseDown(event));
+        this.svgElement.addEventListener("mouseup", (event) => this.handleMouseUp(event));
     }
 
     update(model) {
@@ -124,8 +130,79 @@ export class ModelUI extends UIComponent {
         }
     }
 
+    handleMouseDown(event) {
+        // Find world at click position
+        const clickCoords = this.getCoordinates(event);
+        const worldX = this.snapToGrid(clickCoords.x);
+        const worldY = this.snapToGrid(clickCoords.y);
+        const world = this.getWorldAtPos(worldX, worldY);
+
+        // Add mousemove event listener to world
+        if (world) {
+            this.draggedWorld = world;
+            this.svgElement.addEventListener("mousemove", this.handleMouseMove.bind(this));
+        }
+    }
+
+    handleMouseMove(event) {
+        if (!this.draggedWorld) return;
+
+        const mouseCoords = this.getCoordinates(event);
+        const newX = this.snapToGrid(mouseCoords.x);
+        const newY = this.snapToGrid(mouseCoords.y);
+
+        // Adjust click positions in linkClicks so that they do not change *relative* to the world positions
+        this.updateLinkClickPositions({ worldX: newX, worldY: newY });
+
+        // Update world position
+        this.worldPositions.set(this.draggedWorld, { worldX: newX, worldY: newY });
+        
+        // Redraw model with the updated position
+        this.update(this.model);
+    }
+
+    handleMouseUp(event) {
+        // Remove mousemove event listener when the world is released
+        this.svgElement.removeEventListener("mousemove", this.handleMouseMove.bind(this));
+        this.draggedWorld = null;
+    }
+
     createLinkKey(worldFrom, worldTo, relationIndex) {
         return `${worldFrom.getIndex()}-${worldTo.getIndex()}-${relationIndex}`;
+    }
+
+    updateLinkClickPositions(newWorldPos) {
+        // If worlds are dragged, adjust click positions in linkClicks so that they do not change *relative* to the world positions
+        const draggedWorldPosition = this.worldPositions.get(this.draggedWorld);
+        
+        // Iterate over link click pairs
+        for (const [linkKey, { clickFrom, clickTo }] of this.linkClicks.entries()) {
+            // Parse link key and get worlds
+            const [worldFromIndex, worldToIndex] = linkKey.split('-');
+            const worldFrom = this.model.getWorldByIndex(parseInt(worldFromIndex));
+            const worldTo = this.model.getWorldByIndex(parseInt(worldToIndex));
+    
+            // If the link does not feature the dragged world: continue
+            if (worldFrom !== this.draggedWorld && worldTo !== this.draggedWorld) {
+                continue;
+            }
+    
+            // If the dragged world is the link's worldFrom, adjust clickFrom
+            if (worldFrom === this.draggedWorld) {
+                const offsetX = clickFrom.x - draggedWorldPosition.worldX;
+                const offsetY = clickFrom.y - draggedWorldPosition.worldY;
+                clickFrom.x = newWorldPos.worldX + offsetX;
+                clickFrom.y = newWorldPos.worldY + offsetY;
+            }
+    
+            // If the dragged world is the link's worldTo, adjust clickTo
+            if (worldTo === this.draggedWorld) {
+                const offsetX = clickTo.x - draggedWorldPosition.worldX;
+                const offsetY = clickTo.y - draggedWorldPosition.worldY;
+                clickTo.x = newWorldPos.worldX + offsetX;
+                clickTo.y = newWorldPos.worldY + offsetY;
+            }
+        }
     }
 
     getWorldAtPos(x, y) {
