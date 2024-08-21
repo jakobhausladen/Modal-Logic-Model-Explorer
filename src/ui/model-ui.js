@@ -52,7 +52,9 @@ export class ModelUI extends UIComponent {
         for (const world of model.getWorlds()) {
             const { worldX, worldY } = this.worldPositions.get(world);
             const isSelected = world === selectedWorld;
-            this.svgDrawer.drawWorld(worldX, worldY, isSelected);
+            const worldName = world.getName();
+            const atoms = Array.from(world.getState()).join(', ');
+            this.svgDrawer.drawWorld(worldX, worldY, isSelected, worldName, atoms);
         }
 
         // Draw links

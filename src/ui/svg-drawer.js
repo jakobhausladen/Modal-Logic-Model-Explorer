@@ -35,20 +35,21 @@ export class SVGDrawer {
                 gridMarker.setAttribute("cx", x);
                 gridMarker.setAttribute("cy", y);
                 gridMarker.setAttribute("r", 2);
-                gridMarker.setAttribute("fill", "grey");
+                gridMarker.setAttribute("fill", "lightgrey");
 
                 this.gridLayer.appendChild(gridMarker);
             }
         }
     }
 
-    drawWorld(worldX, worldY, isSelected) {
-        // Draws a world at the specified position
+    drawWorld(worldX, worldY, isSelected, worldName, atoms) {
+        // Draw the world (circle)
         const world = document.createElementNS(this.svgNS, "circle");
         world.setAttribute("cx", worldX);
         world.setAttribute("cy", worldY);
         world.setAttribute("r", this.radius);
-        // Highlight world if it is selected
+
+        // Highlight the world if it is selected
         if (isSelected) {
             world.setAttribute("fill", "lightyellow");
         } else {
@@ -57,6 +58,23 @@ export class SVGDrawer {
         world.setAttribute("stroke", "black");
         world.setAttribute("stroke-width", "1px");
         this.worldLayer.appendChild(world);
+
+        // Render atoms list as SVG using MathJax
+        const mathJaxSvg = MathJax.tex2svg(atoms);
+        const svgElement = mathJaxSvg.querySelector("svg");
+
+        // Set the width, so the atoms list doesnt extend beyond the circle
+        const MAX_WIDTH = this.radius * 1.6;
+        svgElement.setAttribute("width", MAX_WIDTH);
+        this.worldLayer.appendChild(svgElement);
+
+        // Get height of rendered atoms list to adjust the y position
+        const bbox = svgElement.getBoundingClientRect();
+        const height = bbox.height;
+
+        // Adjust the position to center the SVG element
+        svgElement.setAttribute("x", worldX - MAX_WIDTH / 2);
+        svgElement.setAttribute("y", worldY - height / 2);
     }
 
     drawLink(worldFromPos, clickFrom, worldToPos, clickTo, relationIndex) {

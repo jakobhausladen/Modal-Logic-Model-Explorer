@@ -104,5 +104,11 @@ export class PointedModel {
 
     setStateOfSelectedWorld(atoms) {
         this.selectedWorld.setState(atoms);
+        this.notifyObservers();
+    }
+
+    setNameOfSelectedWorld(name) {
+        this.selectedWorld.setName(name);
+        this.notifyObservers();
     }
 }

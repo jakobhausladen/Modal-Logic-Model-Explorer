@@ -18,26 +18,38 @@ export class WorldUI extends UIComponent {
         this.title.textContent = "Selected World";
         this.worldUIContainer.appendChild(this.title);
 
-        // Create atoms container
-        this.atomContainer = document.createElement("div");
-        this.atomContainer.id = "atoms";
+        // Create name input
+        const nameTitle = document.createElement("h3");
+        nameTitle.textContent = "Name";
+        this.worldUIContainer.appendChild(nameTitle);
+
+        this.nameInput = document.createElement("input");
+        this.nameInput.type = "text";
+        this.nameInput.className = "world-input";
+        this.worldUIContainer.appendChild(this.nameInput);
+
+        this.nameInput.addEventListener("input", (event) => {
+            this.model.setNameOfSelectedWorld(this.nameInput.value);
+        });
+
+        // Create name input
+        const propositionTitle = document.createElement("h3");
+        propositionTitle.textContent = "Propositions";
+        this.worldUIContainer.appendChild(propositionTitle);
 
         // Create input elements
         this.inputs = [];
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 6; i++) {
             const input = document.createElement("input");
             input.type = "text";
-            input.className = "atom-input";
+            input.className = "world-input";
 
             // Add input event listener
             input.addEventListener("input", (event) => this.handleInputChange(event));
 
             this.inputs.push(input);
-            this.atomContainer.appendChild(input);
+            this.worldUIContainer.appendChild(input);
         }
-
-        // Append atoms container to worldUIContainer
-        this.worldUIContainer.appendChild(this.atomContainer);
     }
 
     update(model) {
@@ -46,10 +58,18 @@ export class WorldUI extends UIComponent {
         // Clear inputs
         this.clear();
         
-        // Populate inputs with atoms of the selected world
+        // Populate the World UI with information about the selected world
         const selectedWorld = model.getSelectedWorld();
         if (selectedWorld) {
-            this.title.textContent = selectedWorld.getName();
+            // The title should display the selected world's name
+            const name = selectedWorld.getName();
+            this.title.textContent = `World: \\(${name}\\)`;
+            MathJax.typesetPromise([this.title]);
+
+            // Set value of name input to name of selected world
+            this.nameInput.value = name;
+
+            // Fill in the atom inputs and add a placeholder to the first empty input
             const atoms = Array.from(selectedWorld.getState());
             for (let i = 0; i < this.inputs.length; i++) {
                 this.inputs[i].value = atoms[i] || "";
