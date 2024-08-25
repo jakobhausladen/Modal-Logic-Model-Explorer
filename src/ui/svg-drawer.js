@@ -1,11 +1,12 @@
 export class SVGDrawer {
-    constructor(svgElement, svgNS, gridNumber) {
-        this.svgElement = svgElement;
-        this.svgNS = svgNS;
+    constructor(modelGroup, gridNumber) {
+        this.modelGroup = modelGroup;
+        this.svgNS = "http://www.w3.org/2000/svg";
 
         // Calculate width/height of grid cells based on number of cells per dimension
         this.gridNumber = gridNumber;
-        this.gridSize = parseFloat(this.svgElement.getAttribute("width")) / (this.gridNumber + 1);
+        const MODEL_GROUP_WIDTH = 500 // Dimensions are hard-coded elsewhere; could make it adjustable sometime
+        this.gridSize = MODEL_GROUP_WIDTH / (this.gridNumber + 1);
         // Radius of worlds
         this.radius = this.gridSize / 3;
 
@@ -13,13 +14,13 @@ export class SVGDrawer {
     }
 
     init() {
-        // Add seperate layers for grid, worlds, and links to the svgElement
+        // Add seperate layers for grid, worlds, and links to the modelGroup
         this.gridLayer = document.createElementNS(this.svgNS, "g");
         this.linkLayer = document.createElementNS(this.svgNS, "g");
         this.worldLayer = document.createElementNS(this.svgNS, "g");
-        this.svgElement.appendChild(this.gridLayer);
-        this.svgElement.appendChild(this.linkLayer);
-        this.svgElement.appendChild(this.worldLayer);
+        this.modelGroup.appendChild(this.gridLayer);
+        this.modelGroup.appendChild(this.linkLayer);
+        this.modelGroup.appendChild(this.worldLayer);
 
         // Create arrowhead marker for links drawing
         this.initArrowheadMarker()
@@ -32,6 +33,7 @@ export class SVGDrawer {
                 const y = this.gridSize * j;
 
                 const gridMarker = document.createElementNS(this.svgNS, "circle");
+                gridMarker.classList.add("grid-marker");
                 gridMarker.setAttribute("cx", x);
                 gridMarker.setAttribute("cy", y);
                 gridMarker.setAttribute("r", 2);
@@ -45,6 +47,7 @@ export class SVGDrawer {
     drawWorld(worldX, worldY, isSelected, worldName, atoms) {
         // Draw the world (circle)
         const world = document.createElementNS(this.svgNS, "circle");
+        world.classList.add("world");
         world.setAttribute("cx", worldX);
         world.setAttribute("cy", worldY);
         world.setAttribute("r", this.radius);
@@ -60,21 +63,21 @@ export class SVGDrawer {
         this.worldLayer.appendChild(world);
 
         // Render atoms list as SVG using MathJax
-        const mathJaxSvg = MathJax.tex2svg(atoms);
-        const svgElement = mathJaxSvg.querySelector("svg");
+        const mathJaxOutput = MathJax.tex2svg(atoms);
+        const mathJaxSVG = mathJaxOutput.querySelector("svg");
 
         // Set the width, so the atoms list doesnt extend beyond the circle
         const MAX_WIDTH = this.radius * 1.6;
-        svgElement.setAttribute("width", MAX_WIDTH);
-        this.worldLayer.appendChild(svgElement);
+        mathJaxSVG.setAttribute("width", MAX_WIDTH);
+        this.worldLayer.appendChild(mathJaxSVG);
 
         // Get height of rendered atoms list to adjust the y position
-        const bbox = svgElement.getBoundingClientRect();
+        const bbox = mathJaxSVG.getBoundingClientRect();
         const height = bbox.height;
 
         // Adjust the position to center the SVG element
-        svgElement.setAttribute("x", worldX - MAX_WIDTH / 2);
-        svgElement.setAttribute("y", worldY - height / 2);
+        mathJaxSVG.setAttribute("x", worldX - MAX_WIDTH / 2);
+        mathJaxSVG.setAttribute("y", worldY - height / 2);
     }
 
     drawLink(worldFromPos, clickFrom, worldToPos, clickTo, relationIndex) {
@@ -226,7 +229,7 @@ export class SVGDrawer {
         marker.appendChild(path);
 
         // Append marker to the SVG
-        this.svgElement.appendChild(marker);
+        this.modelGroup.appendChild(marker);
     }
 
     drawStraightLine(x1, y1, x2, y2) {

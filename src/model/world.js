@@ -39,4 +39,17 @@ export class World {
     getState() {
         return this.atoms;
     }
+
+    sameState(world) {
+        const atomsOther = world.getState();
+        if (this.atoms.size !== atomsOther.size) {
+            return false;
+        }
+        for (const atom of this.atoms) {
+            if (!atomsOther.has(atom)) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

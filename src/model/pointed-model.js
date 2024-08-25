@@ -100,6 +100,11 @@ export class PointedModel {
         return allLinks;
     }
 
+    getRelationLinks(relationIndex) {
+        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+        return relation.getLinks();
+    }
+
     isAccessible(relationIndex, worldFrom, worldTo) {
         const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
         return relation.isAccessible(worldFrom, worldTo);
@@ -108,6 +113,12 @@ export class PointedModel {
     getAccessibleWorlds(relationIndex, worldFrom) {
         const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
         return relation.getAccessibleWorlds(worldFrom);
+    }
+
+    getLinkingWorlds(relationIndex, worldTo) {
+        // Returns worlds that link to a given world
+        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+        return relation.getLinkingWorlds(worldTo);
     }
 
     setStateOfSelectedWorld(atoms) {

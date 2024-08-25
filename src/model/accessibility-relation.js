@@ -55,4 +55,15 @@ export class AccessibilityRelation {
     getAccessibleWorlds(worldFrom) {
         return Array.from(this.links.get(worldFrom));
     }
+
+    getLinkingWorlds(worldTo) {
+        // Returns worlds that link to a given world
+        const linkingWorlds = [];
+        for (const [worldFrom, accessibleWorlds] of this.links.entries()) {
+            if (accessibleWorlds.has(worldTo)) {
+                linkingWorlds.push(worldFrom);
+            }
+        }
+        return linkingWorlds;
+    }
 }

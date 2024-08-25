@@ -3,10 +3,15 @@ import { SVGDrawer } from "./svg-drawer.js";
 import { World } from "../model/world.js";
 
 export class ModelUI extends UIComponent {
-    constructor(model, gridNumber) {
+    constructor(model, gridNumber, modelGroup, draggingCallback) {
         super(model);
         this.modelUIDiv = document.getElementById("model-ui");
         this.gridNumber = gridNumber;
+
+        this.modelGroup = modelGroup;
+
+        // Since dragging doesn't change the model state (and notify its observers), we need a callback so that the dualUI can remove cross model links when a world is dragged
+        this.draggingCallback = draggingCallback;
 
         // Stores world positions with world as key
         this.worldPositions = new Map();
@@ -27,26 +32,19 @@ export class ModelUI extends UIComponent {
     }
 
     init() {
-        // Add the SVG element that will be the interface for adding/removing and displaying worlds and links
-        this.svgNS = "http://www.w3.org/2000/svg";
-        this.svgElement = document.createElementNS(this.svgNS, "svg");
-        this.svgElement.setAttribute("width", "500");
-        this.svgElement.setAttribute("height", "500");
-        this.modelUIDiv.appendChild(this.svgElement);
-
         // Instantiate the SVGDrawer class to draw the grid, worlds, and links
-        this.svgDrawer = new SVGDrawer(this.svgElement, this.svgNS, this.gridNumber);
+        this.svgDrawer = new SVGDrawer(this.modelGroup, this.gridNumber);
 
         // Draw the grid
         this.svgDrawer.drawGrid();
 
         // Event listeners to handle right and left clicks
-        this.svgElement.addEventListener("click", (event) => this.handleLeftClick(event));
-        this.svgElement.addEventListener("contextmenu", (event) => this.handleRightClick(event));
+        this.modelGroup.addEventListener("click", (event) => this.handleLeftClick(event));
+        this.modelGroup.addEventListener("contextmenu", (event) => this.handleRightClick(event));
 
         // Event listeners for the dragging mechanism
-        this.svgElement.addEventListener("mousedown", (event) => this.handleMouseDown(event));
-        this.svgElement.addEventListener("mouseup", (event) => this.handleMouseUp(event));
+        this.modelGroup.addEventListener("mousedown", (event) => this.handleMouseDown(event));
+        this.modelGroup.addEventListener("mouseup", (event) => this.handleMouseUp(event));
     }
 
     update(model) {
@@ -131,6 +129,9 @@ export class ModelUI extends UIComponent {
     }
 
     handleMouseDown(event) {
+        // Remove cross model links in the DualModelUI
+        this.draggingCallback();
+
         // Find world at click position
         const clickCoords = this.getCoordinates(event);
         const worldX = this.snapToGrid(clickCoords.x);
@@ -140,7 +141,7 @@ export class ModelUI extends UIComponent {
         // Add mousemove event listener to world
         if (world) {
             this.draggedWorld = world;
-            this.svgElement.addEventListener("mousemove", this.handleMouseMove.bind(this));
+            this.modelGroup.addEventListener("mousemove", this.handleMouseMove.bind(this));
         }
     }
 
@@ -163,7 +164,7 @@ export class ModelUI extends UIComponent {
 
     handleMouseUp(event) {
         // Remove mousemove event listener when the world is released
-        this.svgElement.removeEventListener("mousemove", this.handleMouseMove.bind(this));
+        this.modelGroup.removeEventListener("mousemove", this.handleMouseMove.bind(this));
         this.draggedWorld = null;
     }
 
@@ -215,9 +216,13 @@ export class ModelUI extends UIComponent {
         return null;
     }
 
+    getWorldPosition(world) {
+        return this.worldPositions.get(world);
+    }
+
     getCoordinates(event) {
         // Get mouse position relative to the SVG element
-        const rect = this.svgElement.getBoundingClientRect();
+        const rect = this.modelGroup.getBoundingClientRect();
         return {
             x: event.clientX - rect.left,
             y: event.clientY - rect.top,
@@ -225,8 +230,75 @@ export class ModelUI extends UIComponent {
     }
 
     snapToGrid(value) {
-        // Round value to multiple of gridSize
         const gridSize = this.svgDrawer.gridSize;
-        return Math.round(value / gridSize) * gridSize;
+        // Round to the nearest multiple of gridSize
+        let snappedValue = Math.round(value / gridSize) * gridSize;
+        // Constrain value to be between gridSize and (gridNumber * gridSize)
+        if (snappedValue < gridSize) {
+            snappedValue = gridSize;
+        } else if (snappedValue > this.gridNumber * gridSize) {
+            snappedValue = this.gridNumber * gridSize;
+        }
+        return snappedValue;
+    }
+    
+
+    attachGeneratedModel(newModel) {
+        // Delete old drawing info
+        this.worldPositions = new Map();
+        this.linkClicks = new Map();
+
+        // Generate new drawing info
+        this.generateWorldPositions(newModel);
+        this.generateLinkClicks(newModel);
+
+        // Attach to new model
+        console.log("modelUI:", this.model);
+        console.log("modelUI detaching");
+        this.detach();
+        console.log("modelUI:", this.model);
+        console.log("modelUI attaching to new model");
+        this.attach(newModel);
+        console.log("modelUI:", this.model);
+
+        this.update(this.model);
+    }
+
+    generateWorldPositions(model) {
+        const worlds = model.getWorlds();
+        const positions = [];
+    
+        // Generate random positions
+        do {
+            let worldX = Math.random() * 500;
+            let worldY = Math.random() * 500;
+            worldX = this.snapToGrid(worldX);
+            worldY = this.snapToGrid(worldY);
+    
+            const positionOccupied = positions.some(pos => pos.worldX === worldX && pos.worldY === worldY);
+    
+            if (!positionOccupied) {
+                positions.push({ worldX, worldY });
+            }
+        } while (positions.length < worlds.size);
+    
+        // Add positions to the worldPositions Map
+        let index = 0;
+        for (const world of worlds) {
+            this.worldPositions.set(world, positions[index]);
+            index++;
+        }
+    }  
+
+    generateLinkClicks(model) {
+        const links = model.getLinks();
+
+        for (const link of links) {
+            const posFrom = this.worldPositions.get(link.worldFrom);
+            const posTo = this.worldPositions.get(link.worldTo);
+
+            const linkKey = this.createLinkKey(link.worldFrom, link.worldTo, link.relationIndex);
+            this.linkClicks.set(linkKey, {clickFrom: {x: posFrom.worldX, y : posFrom.worldY}, clickTo: {x: posTo.worldX, y : posTo.worldY}});
+        }
     }
 }

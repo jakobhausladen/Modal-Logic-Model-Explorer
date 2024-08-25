@@ -12,21 +12,29 @@ body {
 .sidebar-model-ui-container {
     display: flex;
     justify-content: center;
-    gap: 20px;
 }
 
 #sidebar {
     width: 220px;
     height: 500px;
     border: 1px solid #ccc;
+    border-right: none;
     background-color: white;
 }
 
-#model-ui {
-    width: 500px;
+#drawing-boards {
+    width: 1000px;
     height: 500px;
     border: 1px solid #ccc;
     background-color: white;
+}
+
+#model-buttons-container {
+    width: 50%;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 #formula-ui {
@@ -47,7 +55,7 @@ body {
 }
 
 #formula-input {
-    flex-basis: 70%;
+    flex-basis: 45%;
     padding: 5px 10px;
     margin-right: 5px;
     border: 1px solid #ccc;

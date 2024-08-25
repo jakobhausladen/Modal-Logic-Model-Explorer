@@ -1,11 +1,15 @@
 export class UIComponent {
     constructor(model) {
-        this.model = model;
-        this.model.attachObserver(this);
+        this.attach(model);
     }
 
     update(model) {
-        throw new Error("Method 'update' must be implemented in subclasses of ModelObserver.");
+        throw new Error("Method 'update' must be implemented in subclasses of UIComponent.");
+    }
+
+    attach(model) {
+        this.model = model;
+        this.model.attachObserver(this);
     }
 
     detach() {

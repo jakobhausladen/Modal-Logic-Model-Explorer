@@ -5,6 +5,8 @@ export class WorldUI extends UIComponent {
         super(model);
         this.sidebarContentDiv = sidebarContentDiv;
         this.isActive = false;
+
+        this.activate();
     }
 
     init() {

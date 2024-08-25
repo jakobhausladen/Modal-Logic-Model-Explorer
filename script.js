@@ -1,14 +1,19 @@
 import { PointedModel } from "./src/model/pointed-model.js";
 import { AccessibilityRelation } from "./src/model/accessibility-relation.js";
-import { ModelUI } from "./src/ui/model-ui.js";
-import { Sidebar } from "./src/ui/sidebar.js";
+import { DualModelUI } from "./src/ui/dual-model-ui.js";
 import { FormulaUI } from "./src/ui/formula-ui.js";
+import { WorldUI } from "./src/ui/world-ui.js";
 
-const model = new PointedModel();
+const leftModel = new PointedModel();
+const rightModel = new PointedModel();
 
-const relation = new AccessibilityRelation(1);
-model.addRelation(relation);
+const relation1 = new AccessibilityRelation(1);
+leftModel.addRelation(relation1);
 
-const modelUI = new ModelUI(model, 5);
-const sidebar = new Sidebar(model);
-const formulaUI = new FormulaUI(model);
+const relation2 = new AccessibilityRelation(1);
+rightModel.addRelation(relation2);
+
+const formulaUI = new FormulaUI(leftModel);
+const worldUI = new WorldUI(leftModel, document.getElementById("sidebar"));
+
+const duaModelUI = new DualModelUI(leftModel, rightModel, worldUI, formulaUI, 5);
