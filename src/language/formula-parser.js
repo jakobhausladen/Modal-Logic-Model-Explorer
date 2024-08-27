@@ -1,4 +1,4 @@
-import { AtomicFormula, Negation, Possibility,  Necessity, Conjunction, Disjunction, MaterialImplication, SetConjunction, SetDisjunction } from "./formulas.js";
+import { AtomicFormula, Negation, Possibility,  Necessity, Conjunction, Disjunction, MaterialImplication } from "./formulas.js";
 
 export class FormulaParser {
     // Syntax: A := not B, poss B, nec B, (B and C), (B or C), (B then C)
