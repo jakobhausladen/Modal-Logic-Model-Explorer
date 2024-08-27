@@ -116,31 +116,3 @@ export class MaterialImplication extends BinaryFormula {
         return `(${this.subLeft.toLaTeX()} \\rightarrow ${this.subRight.toLaTeX()})`;
     }
 }
-
-class SetFormula extends Formula {
-    // Abstract class whose sub-classes implement formulas with a set of sub-formulas
-    constructor(subFormulas) {
-        super();
-        this.subFormulas = subFormulas;
-    }
-}
-
-export class SetConjunction extends SetFormula {
-    isSatisfied(world, model)  {
-        return this.subFormulas.every((subF) => subF.isSatisfied(world, model));
-    }
-
-    toLaTeX() {
-        return `\\bigwedge \\{${this.subFormulas.map(f => f.toLaTeX()).join(', ')}\\}`;
-    }
-}
-
-export class SetDisjunction extends SetFormula {
-    isSatisfied(world, model)  {
-        return this.subFormulas.some((subF) => subF.isSatisfied(world, model));
-    }
-
-    toLaTeX() {
-        return `\\bigvee \\{${this.subFormulas.map(f => f.toLaTeX()).join(', ')}\\}`;
-    }
-}

@@ -1,7 +1,7 @@
 import { AtomicFormula, Negation, Possibility,  Necessity, Conjunction, Disjunction, MaterialImplication, SetConjunction, SetDisjunction } from "./formulas.js";
 
 export class FormulaParser {
-    // Syntax: A := not B, poss B, nec B, (B and C), (B or C), (B then C), setAnd(B, C, ...), setOr(B, C, ...)
+    // Syntax: A := not B, poss B, nec B, (B and C), (B or C), (B then C)
 
     parse(input) {
         input = input.trim()
@@ -14,15 +14,13 @@ export class FormulaParser {
             return new Necessity(this.parse(input.substring(4)));
         } else if (input.startsWith("(")) {
             return this.parseBinaryFormula(input);
-        } else if (input.startsWith("set")) {
-            return this.parseSetFormula(input);
         } else {
             return this.parseAtomicFormula(input);
         }
     }
 
     parseAtomicFormula(input) {
-        const reservedSymbols = ["not ", " and ", " or ", " then ", "nec ", "poss ", "setAnd", "setOr", "(", ")"];
+        const reservedSymbols = ["not ", " and ", " or ", " then ", "nec ", "poss ", ",", "(", ")"];
         for (const symbol of reservedSymbols) {
             if (input.includes(symbol)) {
                 throw new Error(`Atomic formula '${input}' contains a reserved symbol: '${symbol}'.`)
@@ -48,11 +46,6 @@ export class FormulaParser {
             case "then":
                 return new MaterialImplication(this.parse(leftSubString), this.parse(rightSubString));
         }
-    }
-
-    parseSetFormula(input) {
-        // Not implemented yet
-        // Determine type of operator, split list of formulas at top level occurances of ",", and return the relevant set formula
     }
 
     findTopLevelOperator(input) {
