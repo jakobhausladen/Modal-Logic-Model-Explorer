@@ -18,10 +18,10 @@ export class ModelUI extends UIComponent {
         // For each link, remember the clicks used to create it
         this.linkClicks = new Map();
 
-        // Counter serves as index for newly created worlds
+        // Counter serves as id for newly created worlds
         this.worldCounter = 0;
 
-        // Relation index 1 is hardcoded for now; later we want the be able to switch between relations
+        // Relation id 1 is hardcoded for now; later we want the be able to switch between relations
         this.selectedRelation = 1;
         // Stores selected world and click position of the first of two clicks used to create a link 
         this.linkStartPoint = null;
@@ -63,12 +63,12 @@ export class ModelUI extends UIComponent {
 
         // Draw links
         for (const link of model.getLinks()) {
-            const { worldFrom, worldTo, relationIndex } = link;
-            const linkKey = this.createLinkKey(worldFrom, worldTo, relationIndex);
+            const { worldFrom, worldTo, relationId: relationId } = link;
+            const linkKey = this.createLinkKey(worldFrom, worldTo, relationId);
             const worldFromPos = this.worldPositions.get(worldFrom);
             const worldToPos = this.worldPositions.get(worldTo);
             const { clickFrom, clickTo } = this.linkClicks.get(linkKey);
-            this.svgDrawer.drawLink(worldFromPos, clickFrom, worldToPos, clickTo, relationIndex);
+            this.svgDrawer.drawLink(worldFromPos, clickFrom, worldToPos, clickTo, relationId);
         }
     }
 
@@ -168,8 +168,8 @@ export class ModelUI extends UIComponent {
         this.draggedWorld = null;
     }
 
-    createLinkKey(worldFrom, worldTo, relationIndex) {
-        return `${worldFrom.getIndex()}-${worldTo.getIndex()}-${relationIndex}`;
+    createLinkKey(worldFrom, worldTo, relationId) {
+        return `${worldFrom.getId()}-${worldTo.getId()}-${relationId}`;
     }
 
     updateLinkClickPositions(newWorldPos) {
@@ -179,9 +179,9 @@ export class ModelUI extends UIComponent {
         // Iterate over link click pairs
         for (const [linkKey, { clickFrom, clickTo }] of this.linkClicks.entries()) {
             // Parse link key and get worlds
-            const [worldFromIndex, worldToIndex] = linkKey.split('-');
-            const worldFrom = this.model.getWorldByIndex(parseInt(worldFromIndex));
-            const worldTo = this.model.getWorldByIndex(parseInt(worldToIndex));
+            const [worldFromId, worldToId] = linkKey.split('-');
+            const worldFrom = this.model.getWorldById(parseInt(worldFromId));
+            const worldTo = this.model.getWorldById(parseInt(worldToId));
     
             // If the link does not feature the dragged world: continue
             if (worldFrom !== this.draggedWorld && worldTo !== this.draggedWorld) {
@@ -253,13 +253,8 @@ export class ModelUI extends UIComponent {
         this.generateLinkClicks(newModel);
 
         // Attach to new model
-        console.log("modelUI:", this.model);
-        console.log("modelUI detaching");
         this.detach();
-        console.log("modelUI:", this.model);
-        console.log("modelUI attaching to new model");
         this.attach(newModel);
-        console.log("modelUI:", this.model);
 
         this.update(this.model);
     }
@@ -297,7 +292,7 @@ export class ModelUI extends UIComponent {
             const posFrom = this.worldPositions.get(link.worldFrom);
             const posTo = this.worldPositions.get(link.worldTo);
 
-            const linkKey = this.createLinkKey(link.worldFrom, link.worldTo, link.relationIndex);
+            const linkKey = this.createLinkKey(link.worldFrom, link.worldTo, link.relationId);
             this.linkClicks.set(linkKey, {clickFrom: {x: posFrom.worldX, y : posFrom.worldY}, clickTo: {x: posTo.worldX, y : posTo.worldY}});
         }
     }

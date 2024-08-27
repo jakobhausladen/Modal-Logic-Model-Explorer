@@ -80,8 +80,8 @@ export class SVGDrawer {
         mathJaxSVG.setAttribute("y", worldY - height / 2);
     }
 
-    drawLink(worldFromPos, clickFrom, worldToPos, clickTo, relationIndex) {
-        // relationIndex currently not used, but will be relevant if we have more than one relation
+    drawLink(worldFromPos, clickFrom, worldToPos, clickTo, relationId) {
+        // relationId currently not used, but will be relevant if we have more than one relation
         const reflexive = this.sameWorldClicked(worldFromPos, worldToPos);
         const straight = this.worldCentersClicked(worldFromPos, clickFrom, worldToPos, clickTo);
 

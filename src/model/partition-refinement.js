@@ -93,7 +93,7 @@ export class PartitionRefinement {
         for (const equivClass of partition) {
             console.log("class:");
             for (const world of equivClass) {
-                console.log(world.getIndex());
+                console.log(world.getId());
             }
         }
 
@@ -110,7 +110,7 @@ export class PartitionRefinement {
             for (const equivClass of partition) {
                 console.log("class:");
                 for (const world of equivClass) {
-                    console.log(world.getIndex());
+                    console.log(world.getId());
                 }
             }
 
@@ -135,7 +135,7 @@ export class PartitionRefinement {
             }
         }
 
-        // Relation with index 1: { worldFrom, worldTo, relationIndex }
+        // Relation with id 1: { worldFrom, worldTo, relationId }
         const origLinks = origModel.getRelationLinks(1);
 
         const newRelation = new AccessibilityRelation(1);
@@ -143,9 +143,9 @@ export class PartitionRefinement {
 
         for (const link of origLinks) {
             const indexFrom = partition.findIndex(equivClass => equivClass.has(link.worldFrom));
-            const worldFrom = newModel.getWorldByIndex(indexFrom);
+            const worldFrom = newModel.getWorldById(indexFrom);
             const indexTo = partition.findIndex(equivClass => equivClass.has(link.worldTo));
-            const worldTo = newModel.getWorldByIndex(indexTo);
+            const worldTo = newModel.getWorldById(indexTo);
 
             newModel.addLink(1, worldFrom, worldTo);
         }
@@ -176,8 +176,8 @@ export class PartitionRefinement {
         for (const world of worldsUnion) {
             combinedModel.addWorld(world);
         }
-        for (const { worldFrom, worldTo, relationIndex } of linksUnion) {
-            combinedModel.addLink(relationIndex, worldFrom, worldTo);
+        for (const { worldFrom, worldTo, relationId } of linksUnion) {
+            combinedModel.addLink(relationId, worldFrom, worldTo);
         }
     
         return combinedModel;

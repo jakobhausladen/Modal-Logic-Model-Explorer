@@ -1,12 +1,18 @@
 import { UIComponent } from "./ui-component.js"
 import { FormulaParser } from "../language/formula-parser.js";
+import { Tableaux } from "../model/tableaux.js";
+import { PartitionRefinement } from "../model/partition-refinement.js";
+import { Negation } from "../language/formulas.js";
 
 export class FormulaUI extends UIComponent {
-    constructor(model) {
+    constructor(model, generateCountermodelCallback) {
         super(model);
+        this.generateCountermodelCallback = generateCountermodelCallback;
         this.formulaUIDiv = document.getElementById("formula-ui");
         this.formula = null;
         this.parser = new FormulaParser();
+        this.tableaux = new Tableaux();
+        this.partitionRefinement = new PartitionRefinement()
 
         this.init();
     }
@@ -25,10 +31,26 @@ export class FormulaUI extends UIComponent {
         inputDiv.appendChild(this.input);
 
         // Create button to submit formula
+        this.evaluateButton = document.createElement("button");
+        this.evaluateButton.id = "evaluate-button";
+        this.evaluateButton.textContent = "Evaluate";
+        inputDiv.appendChild(this.evaluateButton);
+
+        // Event listener for button
+        this.evaluateButton.addEventListener("click", (event) => {
+            this.parseFormula();
+        });
+
+        // Create button to check valitity
         this.confirmButton = document.createElement("button");
-        this.confirmButton.id = "formulaButton";
-        this.confirmButton.textContent = "Confirm";
+        this.confirmButton.id = "countermodel-button";
+        this.confirmButton.textContent = "Countermodel";
         inputDiv.appendChild(this.confirmButton);
+
+        // Event listener for button
+        this.confirmButton.addEventListener("click", (event) => {
+            this.generateCountermodel();
+        });
 
         // Create divs to display formula string representation and truth value
         this.formulaDisplay = document.createElement("div");
@@ -43,10 +65,6 @@ export class FormulaUI extends UIComponent {
         this.truthDisplay.style.fontSize = "20px";
         this.formulaUIDiv.appendChild(this.truthDisplay);
 
-        // Event listener for button
-        this.confirmButton.addEventListener("click", (event) => {
-            this.parseFormula();
-        });
     }
 
     parseFormula() {
@@ -81,12 +99,22 @@ export class FormulaUI extends UIComponent {
             const selectedWorld = this.model.getSelectedWorld();
             if (selectedWorld) {
                 const truthValue = this.formula.isSatisfied(selectedWorld, this.model);
-                this.truthDisplay.textContent = "Truth value: " + truthValue;
+                this.truthDisplay.textContent = `is ${truthValue} at \\(${selectedWorld.getName()}\\)`;
+                MathJax.typesetPromise();
             } else {
                 this.truthDisplay.textContent = "";
             }
         } else {
             this.truthDisplay.textContent = "Enter a formula to evaluate.";
+        }
+    }
+
+    generateCountermodel() {
+        this.tableaux.setRoot(new Negation(this.formula));
+        const countermodel = this.tableaux.constructModel();
+        const minimalCountermodel = this.partitionRefinement.reduceModel(countermodel);
+        if (minimalCountermodel) {
+            this.generateCountermodelCallback(minimalCountermodel);
         }
     }
 }

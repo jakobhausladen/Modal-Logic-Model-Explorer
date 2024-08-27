@@ -14,8 +14,8 @@ class Node {
 }
 
 export class Tableaux {
-    constructor(formula) {
-        this.rootNode = new Node(formula, 0);
+    constructor() {
+        this.rootNode = null
         this.openBranches = [];
         this.rules = [
             // Non-branching rules
@@ -35,8 +35,13 @@ export class Tableaux {
             this.disjunctionRule.bind(this),
             this.negatedConjunctionRule.bind(this)
         ];
+    }
 
+    setRoot(formula) {
+        this.openBranches = [];
+        this.rootNode = new Node(formula, 0);
         this.growTree(this.rootNode, [], [0], [], []);
+        this.printTree();
     }
 
     growTree(node, ancestorNodes, worlds, links, literals) {
@@ -373,7 +378,7 @@ export class Tableaux {
         const atoms = literals.filter(literal => literal.formula instanceof AtomicFormula);
         for (const negation of negations) {
             for (const atom of atoms) {
-                if (negation.formula.subFormula.atom === atom.formula.atom) {
+                if (negation.formula.subFormula.atom === atom.formula.atom && negation.world === atom.world) {
                     return true;
                 }
             }
@@ -418,7 +423,7 @@ export class Tableaux {
 
             // Add links based on branch
             for (const { worldFrom, worldTo } of links) {
-                model.addLink(1, model.getWorldByIndex(worldFrom), model.getWorldByIndex(worldTo));
+                model.addLink(1, model.getWorldById(worldFrom), model.getWorldById(worldTo));
             }
 
             return model;

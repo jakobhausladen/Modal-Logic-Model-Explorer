@@ -13,7 +13,6 @@ leftModel.addRelation(relation1);
 const relation2 = new AccessibilityRelation(1);
 rightModel.addRelation(relation2);
 
-const formulaUI = new FormulaUI(leftModel);
 const worldUI = new WorldUI(leftModel, document.getElementById("sidebar"));
 
-const duaModelUI = new DualModelUI(leftModel, rightModel, worldUI, formulaUI, 5);
+const duaModelUI = new DualModelUI(leftModel, rightModel, worldUI, 5);

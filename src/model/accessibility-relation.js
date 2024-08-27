@@ -1,14 +1,14 @@
 import { DefaultMap } from "../utils/default-map.js";
 
 export class AccessibilityRelation {
-    constructor(index, name=`Relation ${index}`) {
-        this.index = index;
+    constructor(id, name=`Relation ${id}`) {
+        this.id = id;
         this.name = name;
         this.links = new DefaultMap(() => new Set());
     }
 
-    getIndex() {
-        return this.index;
+    getId() {
+        return this.id;
     }
 
     getName() {
@@ -28,11 +28,11 @@ export class AccessibilityRelation {
     }
 
     getLinks() {
-        // Returns an array of link objects of the form { worldFrom, worldTo, relationIndex }
+        // Returns an array of link objects of the form { worldFrom, worldTo, relationId }
         const linkObjects = [];
         for (const [worldFrom, accessibleWorlds] of this.links.entries()) {
             for (const worldTo of accessibleWorlds) {
-                linkObjects.push({ worldFrom, worldTo, relationIndex: this.index });
+                linkObjects.push({ worldFrom, worldTo, relationId: this.id });
             }
         }
         return linkObjects;

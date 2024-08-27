@@ -45,14 +45,14 @@ export class Negation extends UnaryFormula {
 }
 
 export class Possibility extends UnaryFormula {
-    constructor(subFormula, relationIndex=1) {
+    constructor(subFormula, relationId=1) {
         super(subFormula);
-        this.relationIndex = relationIndex;
+        this.relationId = relationId;
     }
 
     isSatisfied(world, model) {
         // Relation hard coded for now
-        const accessibleWorlds = model.getAccessibleWorlds(this.relationIndex, world);
+        const accessibleWorlds = model.getAccessibleWorlds(this.relationId, world);
         return accessibleWorlds.some((accessibleWorld) => this.subFormula.isSatisfied(accessibleWorld, model));
     }
 
@@ -62,14 +62,14 @@ export class Possibility extends UnaryFormula {
 }
 
 export class Necessity extends UnaryFormula {
-    constructor(subFormula, relationIndex=1) {
+    constructor(subFormula, relationId=1) {
         super(subFormula);
-        this.relationIndex = relationIndex;
+        this.relationId = relationId;
     }
 
     isSatisfied(world, model) {
         // Relation hard coded for now
-        const accessibleWorlds = model.getAccessibleWorlds(this.relationIndex, world);
+        const accessibleWorlds = model.getAccessibleWorlds(this.relationId, world);
         return accessibleWorlds.every((accessibleWorld) => this.subFormula.isSatisfied(accessibleWorld, model));
     }
 

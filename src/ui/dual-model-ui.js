@@ -1,15 +1,16 @@
 import { ModelUI } from "./model-ui.js";
+import { FormulaUI } from "./formula-ui.js";
 import { PartitionRefinement } from "../model/partition-refinement.js";
 
 export class DualModelUI {
-    constructor(leftModel, rightModel, worldUI, formulaUI, gridNumber) {
+    constructor(leftModel, rightModel, worldUI, gridNumber) {
         this.leftModel = leftModel;
         this.rightModel = rightModel;
         this.attach()
 
         this.activeModel = this.leftModel;
         this.worldUI = worldUI;
-        this.formulaUI = formulaUI;
+        this.formulaUI = new FormulaUI(this.leftModel, this.setRightModel.bind(this));
 
         this.gridNumber = gridNumber;
         const MODEL_GROUP_WIDTH = 500 // Dimensions are hard-coded elsewhere; could make it adjustable sometime
@@ -139,12 +140,16 @@ export class DualModelUI {
     reduceLeftModel() {
         // Instatiate reduced model
         const reducedModel = this.partitionRefinement.reduceModel(this.leftModel);
+        this.setRightModel(reducedModel);
+    }
+
+    setRightModel(model) {
         // Remove cross-model links
         this.clearLinkLayer()
         // Let right modelUI generate drawing information and attach to the model
-        this.rightModelUI.attachGeneratedModel(reducedModel);
-        // Set rightModel to reduced model
-        this.rightModel = reducedModel;
+        this.rightModelUI.attachGeneratedModel(model);
+        // Set rightModel to the new model
+        this.rightModel = model;
         // Stop observing the pevious right model and start observing the new right model
         this.detach();
         this.attach();

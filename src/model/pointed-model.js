@@ -45,9 +45,9 @@ export class PointedModel {
         return this.worlds;
     }
 
-    getWorldByIndex(index) {
+    getWorldById(id) {
         for (const world of this.worlds) {
-            if (world.getIndex() === index) {
+            if (world.getId() === id) {
                 return world;
             }
         }
@@ -69,21 +69,21 @@ export class PointedModel {
         this.notifyObservers();
     }
 
-    removeRelation(relationIndex) {
-        this.relations = this.relations.filter(relation => relation.getIndex() != relationIndex);
+    removeRelation(relationId) {
+        this.relations = this.relations.filter(relation => relation.getId() != relationId);
         this.notifyObservers();
     }
 
-    addLink(relationIndex, worldFrom, worldTo) {
-        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+    addLink(relationId, worldFrom, worldTo) {
+        const relation = this.relations.find(relation => relation.getId() === relationId);
         if (relation) {
             relation.addLink(worldFrom, worldTo);
         }
         this.notifyObservers();
     }
 
-    removeLink(relationIndex, worldFrom, worldTo) {
-        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+    removeLink(relationId, worldFrom, worldTo) {
+        const relation = this.relations.find(relation => relation.getId() === relationId);
         if (relation) {
             relation.removeLink(worldFrom, worldTo);
         }
@@ -91,7 +91,7 @@ export class PointedModel {
     }
 
     getLinks() {
-        // Returns an array of link objects of the form { worldFrom, worldTo, relationIndex }
+        // Returns an array of link objects of the form { worldFrom, worldTo, relationId }
         const allLinks = [];
         for (const relation of this.relations) {
             const relationLinks = relation.getLinks();
@@ -100,24 +100,24 @@ export class PointedModel {
         return allLinks;
     }
 
-    getRelationLinks(relationIndex) {
-        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+    getRelationLinks(relationId) {
+        const relation = this.relations.find(relation => relation.getId() === relationId);
         return relation.getLinks();
     }
 
-    isAccessible(relationIndex, worldFrom, worldTo) {
-        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+    isAccessible(relationId, worldFrom, worldTo) {
+        const relation = this.relations.find(relation => relation.getId() === relationId);
         return relation.isAccessible(worldFrom, worldTo);
     }
 
-    getAccessibleWorlds(relationIndex, worldFrom) {
-        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+    getAccessibleWorlds(relationId, worldFrom) {
+        const relation = this.relations.find(relation => relation.getId() === relationId);
         return relation.getAccessibleWorlds(worldFrom);
     }
 
-    getLinkingWorlds(relationIndex, worldTo) {
+    getLinkingWorlds(relationId, worldTo) {
         // Returns worlds that link to a given world
-        const relation = this.relations.find(relation => relation.getIndex() === relationIndex);
+        const relation = this.relations.find(relation => relation.getId() === relationId);
         return relation.getLinkingWorlds(worldTo);
     }
 

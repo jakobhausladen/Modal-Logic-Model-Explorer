@@ -1,12 +1,12 @@
 export class World {
-    constructor(index, name=`w_{${index}}`) {
-        this.index = index;
+    constructor(id, name=`w_{${id}}`) {
+        this.id = id;
         this.name = name;
         this.atoms = new Set();
     }
 
-    getIndex() {
-        return this.index;
+    getId() {
+        return this.id;
     }
 
     setName(name) {
