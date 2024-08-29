@@ -153,6 +153,9 @@ export class DualModelUI {
         // Stop observing the pevious right model and start observing the new right model
         this.detach();
         this.attach();
+        
+        // Hacky way of triggering an update in the world and formula UIs
+        this.rightModel.setSelectedWorld(this.rightModel.getSelectedWorld());
     }
 
     drawBisimulation() {

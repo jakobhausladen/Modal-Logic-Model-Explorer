@@ -426,6 +426,8 @@ export class Tableaux {
                 model.addLink(1, model.getWorldById(worldFrom), model.getWorldById(worldTo));
             }
 
+            model.setSelectedWorld(model.getWorldById(0));
+
             return model;
         } else {
             return null;
