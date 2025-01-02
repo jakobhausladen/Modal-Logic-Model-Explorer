@@ -46,6 +46,10 @@ body {
     align-items: center;
 }
 
+.world {
+    /* cursor: pointer; */
+}
+
 
 /* Formula UI */
 #input-container {
