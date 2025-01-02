@@ -17,7 +17,7 @@ This repository implements a [web application](https://jakobhausladen.github.io/
 
 Below is an example of the application interface. On the left, a model is drawn, and on the right, its reduced bisimilar model is displayed. The formula is evaluated as true at the selected world.
 
-![An image of the app's UI](UI.png)  
+![An image of the app's UI](UI.PNG)  
 *Figure: Example of the app interface.*
 
 ### Main Components:
